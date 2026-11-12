@@ -1,0 +1,393 @@
+
+-- 1. Select the project database
+USE marketing_campaign_db;
+
+-- 2. Check total customer records
+SELECT COUNT(*) AS Total_Customers
+FROM customers;
+
+-- 3. View the table structure
+DESCRIBE customers;
+
+-- 4. View the first 10 customer records
+SELECT *
+FROM customers
+LIMIT 10;
+
+-- 5. Check campaign response values
+SELECT
+    Response,
+    COUNT(*) AS Customer_Count
+FROM customers
+GROUP BY Response;
+
+
+
+SELECT
+    COUNT(*) AS Total_Customers,
+    SUM(CASE WHEN Response = '1' THEN 1 ELSE 0 END)
+        AS Responded_Customers,
+    ROUND(
+        SUM(CASE WHEN Response = '1' THEN 1 ELSE 0 END)
+        * 100.0 / COUNT(*),
+        2
+    ) AS Response_Rate_Percentage
+FROM customers;
+
+
+
+USE marketing_campaign_db;
+
+SELECT
+    'Campaign 1' AS Campaign,
+    SUM(CASE WHEN AcceptedCmp1 = '1' THEN 1 ELSE 0 END) AS Accepted_Customers,
+    ROUND(
+        SUM(CASE WHEN AcceptedCmp1 = '1' THEN 1 ELSE 0 END)
+        * 100.0 / COUNT(*), 2
+    ) AS Acceptance_Rate
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Campaign 2',
+    SUM(CASE WHEN AcceptedCmp2 = '1' THEN 1 ELSE 0 END),
+    ROUND(
+        SUM(CASE WHEN AcceptedCmp2 = '1' THEN 1 ELSE 0 END)
+        * 100.0 / COUNT(*), 2
+    )
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Campaign 3',
+    SUM(CASE WHEN AcceptedCmp3 = '1' THEN 1 ELSE 0 END),
+    ROUND(
+        SUM(CASE WHEN AcceptedCmp3 = '1' THEN 1 ELSE 0 END)
+        * 100.0 / COUNT(*), 2
+    )
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Campaign 4',
+    SUM(CASE WHEN AcceptedCmp4 = '1' THEN 1 ELSE 0 END),
+    ROUND(
+        SUM(CASE WHEN AcceptedCmp4 = '1' THEN 1 ELSE 0 END)
+        * 100.0 / COUNT(*), 2
+    )
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Campaign 5',
+    SUM(CASE WHEN AcceptedCmp5 = '1' THEN 1 ELSE 0 END),
+    ROUND(
+        SUM(CASE WHEN AcceptedCmp5 = '1' THEN 1 ELSE 0 END)
+        * 100.0 / COUNT(*), 2
+    )
+FROM customers;
+
+
+
+USE marketing_campaign_db;
+
+SELECT
+    'Wines' AS Product_Category,
+    SUM(CAST(MntWines AS DECIMAL(12,2))) AS Total_Sales
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Fruits',
+    SUM(CAST(MntFruits AS DECIMAL(12,2)))
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Meat Products',
+    SUM(CAST(MntMeatProducts AS DECIMAL(12,2)))
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Fish Products',
+    SUM(CAST(MntFishProducts AS DECIMAL(12,2)))
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Sweet Products',
+    SUM(CAST(MntSweetProducts AS DECIMAL(12,2)))
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Gold Products',
+    SUM(CAST(MntGoldProds AS DECIMAL(12,2)))
+FROM customers
+
+ORDER BY Total_Sales DESC;
+
+
+SELECT
+    CASE
+        WHEN CAST(Age AS UNSIGNED) < 30 THEN 'Below 30'
+        WHEN CAST(Age AS UNSIGNED) BETWEEN 30 AND 39 THEN '30-39'
+        WHEN CAST(Age AS UNSIGNED) BETWEEN 40 AND 49 THEN '40-49'
+        WHEN CAST(Age AS UNSIGNED) BETWEEN 50 AND 59 THEN '50-59'
+        ELSE '60 and Above'
+    END AS Age_Group,
+
+    COUNT(*) AS Total_Customers,
+
+    ROUND(AVG(CAST(Total_Spend AS DECIMAL(12,2))), 2)
+        AS Average_Spending,
+
+    SUM(CAST(Total_Spend AS DECIMAL(12,2)))
+        AS Total_Spending
+
+FROM customers
+GROUP BY Age_Group
+ORDER BY Average_Spending DESC;
+
+
+SELECT
+    CASE
+        WHEN CAST(Income AS DECIMAL(12,2)) <= 30000 THEN 'Below 30K'
+        WHEN CAST(Income AS DECIMAL(12,2)) <= 50000 THEN '30K-50K'
+        WHEN CAST(Income AS DECIMAL(12,2)) <= 75000 THEN '50K-75K'
+        ELSE 'Above 75K'
+    END AS Income_Group,
+
+    COUNT(*) AS Total_Customers,
+
+    ROUND(AVG(CAST(Total_Spend AS DECIMAL(12,2))), 2)
+        AS Average_Spending,
+
+    SUM(CAST(Total_Spend AS DECIMAL(12,2)))
+        AS Total_Spending
+
+FROM customers
+GROUP BY Income_Group
+ORDER BY Average_Spending DESC;
+
+
+
+SELECT
+    Marital_Status,
+
+    COUNT(*) AS Total_Customers,
+
+    ROUND(AVG(CAST(Total_Spend AS DECIMAL(12,2))), 2)
+        AS Average_Spending,
+
+    SUM(CAST(Total_Spend AS DECIMAL(12,2)))
+        AS Total_Spending
+
+FROM customers
+GROUP BY Marital_Status
+ORDER BY Average_Spending DESC;
+
+
+USE marketing_campaign_db;
+
+SELECT
+    'Web' AS Purchase_Channel,
+    SUM(CAST(NumWebPurchases AS UNSIGNED)) AS Total_Purchases,
+    ROUND(AVG(CAST(NumWebPurchases AS UNSIGNED)), 2)
+        AS Avg_Purchases_Per_Customer
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Catalogue',
+    SUM(CAST(NumCatalogPurchases AS UNSIGNED)),
+    ROUND(AVG(CAST(NumCatalogPurchases AS UNSIGNED)), 2)
+FROM customers
+
+UNION ALL
+
+SELECT
+    'Store',
+    SUM(CAST(NumStorePurchases AS UNSIGNED)),
+    ROUND(AVG(CAST(NumStorePurchases AS UNSIGNED)), 2)
+FROM customers
+
+ORDER BY Total_Purchases DESC;
+
+
+SELECT
+    NumWebVisitsMonth AS Monthly_Web_Visits,
+    COUNT(*) AS Total_Customers,
+    ROUND(
+        AVG(CAST(NumWebPurchases AS UNSIGNED)), 2
+    ) AS Avg_Web_Purchases
+FROM customers
+GROUP BY NumWebVisitsMonth
+ORDER BY CAST(NumWebVisitsMonth AS UNSIGNED);
+
+
+USE marketing_campaign_db;
+
+SELECT
+    CASE
+        WHEN CAST(Income AS DECIMAL(10,2)) > 75000
+            THEN 'Above 75K'
+        WHEN CAST(Income AS DECIMAL(10,2)) >= 50000
+            THEN '50K-75K'
+        WHEN CAST(Income AS DECIMAL(10,2)) >= 30000
+            THEN '30K-50K'
+        ELSE 'Below 30K'
+    END AS Income_Group,
+
+    COUNT(*) AS Total_Customers,
+
+    SUM(CASE
+        WHEN CAST(Response AS UNSIGNED) = 1 THEN 1
+        ELSE 0
+    END) AS Responded_Customers,
+
+    ROUND(
+        SUM(CASE
+            WHEN CAST(Response AS UNSIGNED) = 1 THEN 1
+            ELSE 0
+        END) * 100.0 / COUNT(*),
+        2
+    ) AS Response_Rate
+
+FROM customers
+GROUP BY Income_Group
+ORDER BY Response_Rate DESC;
+
+SELECT
+    CASE
+        WHEN CAST(Total_Spend AS DECIMAL(10,2)) >= 2000
+            THEN 'Very High Spenders'
+        WHEN CAST(Total_Spend AS DECIMAL(10,2)) >= 1000
+            THEN 'High Spenders'
+        WHEN CAST(Total_Spend AS DECIMAL(10,2)) >= 500
+            THEN 'Medium Spenders'
+        ELSE 'Low Spenders'
+    END AS Spending_Group,
+
+    COUNT(*) AS Total_Customers,
+
+    SUM(CASE
+        WHEN CAST(Response AS UNSIGNED) = 1 THEN 1
+        ELSE 0
+    END) AS Responders,
+
+    SUM(CASE
+        WHEN CAST(Response AS UNSIGNED) = 0 THEN 1
+        ELSE 0
+    END) AS Non_Responders,
+
+    ROUND(AVG(CAST(Total_Spend AS DECIMAL(10,2))), 2)
+        AS Average_Spend
+
+FROM customers
+GROUP BY Spending_Group
+ORDER BY Average_Spend DESC;
+
+SELECT
+    CASE
+        WHEN CAST(Income AS DECIMAL(10,2)) > 75000
+            THEN 'Above 75K'
+        WHEN CAST(Income AS DECIMAL(10,2)) >= 50000
+            THEN '50K-75K'
+        ELSE 'Below 50K'
+    END AS Income_Group,
+
+    CASE
+        WHEN CAST(Total_Spend AS DECIMAL(10,2)) >= 2000
+            THEN 'Very High'
+        WHEN CAST(Total_Spend AS DECIMAL(10,2)) >= 1000
+            THEN 'High'
+        ELSE 'Low/Medium'
+    END AS Spending_Group,
+
+    COUNT(*) AS Total_Customers,
+
+    ROUND(AVG(CAST(Total_Spend AS DECIMAL(10,2))), 2)
+        AS Average_Spend,
+
+    ROUND(
+        AVG(CAST(Response AS UNSIGNED)) * 100,
+        2
+    ) AS Response_Rate
+
+FROM customers
+GROUP BY Income_Group, Spending_Group
+ORDER BY Response_Rate DESC;
+
+SELECT
+    CASE
+        WHEN CAST(Age AS UNSIGNED) >= 60 THEN '60 and Above'
+        WHEN CAST(Age AS UNSIGNED) >= 50 THEN '50-59'
+        WHEN CAST(Age AS UNSIGNED) >= 40 THEN '40-49'
+        ELSE 'Below 40'
+    END AS Age_Group,
+
+    COUNT(*) AS Total_Customers,
+
+    ROUND(
+        AVG(CAST(Total_Spend AS DECIMAL(10,2))), 2
+    ) AS Average_Spend,
+
+    ROUND(
+        AVG(CAST(Response AS UNSIGNED)) * 100, 2
+    ) AS Response_Rate
+
+FROM customers
+
+WHERE CAST(Income AS DECIMAL(10,2)) > 75000
+  AND CAST(Total_Spend AS DECIMAL(10,2)) >= 2000
+
+GROUP BY Age_Group
+ORDER BY Response_Rate DESC;
+
+SELECT
+    CASE
+        WHEN CAST(Age AS UNSIGNED) >= 60 THEN '60 and Above'
+        WHEN CAST(Age AS UNSIGNED) >= 50 THEN '50-59'
+        WHEN CAST(Age AS UNSIGNED) >= 40 THEN '40-49'
+        ELSE 'Below 40'
+    END AS Age_Group,
+
+    COUNT(*) AS Total_Customers,
+
+    SUM(
+        CASE
+            WHEN CAST(Response AS UNSIGNED) = 1 THEN 1
+            ELSE 0
+        END
+    ) AS Responders,
+
+    SUM(
+        CASE
+            WHEN CAST(Response AS UNSIGNED) = 0 THEN 1
+            ELSE 0
+        END
+    ) AS Non_Responders,
+
+    ROUND(
+        AVG(CAST(Response AS UNSIGNED)) * 100, 2
+    ) AS Response_Rate
+
+FROM customers
+
+WHERE CAST(Income AS DECIMAL(10,2)) > 75000
+  AND CAST(Total_Spend AS DECIMAL(10,2)) >= 2000
+
+GROUP BY Age_Group
+ORDER BY Responders DESC;
